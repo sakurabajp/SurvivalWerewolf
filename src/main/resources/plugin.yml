@@ -1,0 +1,10 @@
+name: SurvivalWerewolf
+version: '${project.version}'
+main: net.cherryleaves.survivalwerewolf.SurvivalWerewolf
+api-version: 1.16
+authors: [ sakuraba_jp ]
+commands:
+  startgame:
+    description: start SurvivalWerewolf game.
+  stopgame:
+    description: stop the game.
