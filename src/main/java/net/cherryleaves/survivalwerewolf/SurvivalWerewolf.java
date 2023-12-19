@@ -22,6 +22,9 @@ import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
+    public BukkitRunnable chatFlowTask;
+    public BukkitRunnable TimerTask;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -35,8 +38,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         getLogger().info(ChatColor.GREEN + "java素人の私が書いたコードですので、");
         getLogger().info(ChatColor.GREEN + "修正とかあれば是非Githubにプルリク投げて下さい(ただし見るとは言ってない)");
         getLogger().info("");
-        getLogger().info(ChatColor.RED + "追記:ダウンロードサイト記載のLocate-Chatを導入するとまた面白いかもしれません！");
-        getLogger().info("");
         getLogger().info(ChatColor.GREEN + "ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー");
         Objects.requireNonNull(getCommand("startgame")).setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
@@ -45,6 +46,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        stopChatFlowTask();
         super.onDisable();
     }
 
@@ -65,11 +67,12 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             AdminPlayer.playSound(AdminPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.7f, 1.0f);
             openGUI(Objects.requireNonNull(AdminPlayer));
         }
-        if (command.getName().equalsIgnoreCase("endgame")) {
+        if (command.getName().equalsIgnoreCase("stopgame")) {
             if (!(sender instanceof Player) || !sender.isOp()) {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
             }
+            LocateChatEnd();
         }
         return false;
     }
@@ -218,6 +221,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             playerALL5.removeScoreboardTag("Admin1");
         }
         startTimer();
+        LocateChat();
     }
 
     private void updateScoreboard(int timeRemaining) {
@@ -233,7 +237,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     }
 
     private void startTimer() {
-        BukkitRunnable timerTask = new BukkitRunnable() {
+        TimerTask = new BukkitRunnable() {
             int timeRemaining = 60 * 60 * 3;
             @Override
             public void run() {
@@ -245,7 +249,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 timeRemaining--;
             }
         };
-        timerTask.runTaskTimer(this, 0, 20); // 1秒ごとにタイマーを更新
+        TimerTask.runTaskTimer(this, 0, 20); // 1秒ごとにタイマーを更新
     }
 
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
@@ -322,5 +326,45 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         event.setDeathMessage(modifiedDeathMessage);
         // オリジナルの死亡ログをコンソールに表示する
         getLogger().info(originalDeathMessage);
+    }
+
+    public void LocateChat(){
+        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        chatFlowTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Random random = new Random();
+                Player randomPlayer = players.get(random.nextInt(players.size()));
+                String playerName = randomPlayer.getName();
+                if (randomPlayer.getGameMode() == GameMode.SPECTATOR) {
+                    return;
+                }
+                int x = randomPlayer.getLocation().getBlockX();
+                int y = randomPlayer.getLocation().getBlockY();
+                int z = randomPlayer.getLocation().getBlockZ();
+                Location location = randomPlayer.getLocation();
+                String dimensionName = Objects.requireNonNull(location.getWorld()).getEnvironment().name();
+                for (Player playerA : Bukkit.getOnlinePlayers()) {
+                    playerA.playSound(playerA.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 0.1f);
+                }
+                Bukkit.broadcastMessage(ChatColor.YELLOW + "位置情報公開の時間です。");
+                Bukkit.broadcastMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + x + ", Y=" + y + ", Z=" + z + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
+            }
+        };
+        chatFlowTask.runTaskTimer(this, 0, 6000); // 6000 ticks = 5 minutes
+        }
+
+    public void LocateChatEnd(){
+        if (chatFlowTask != null) {
+            chatFlowTask.cancel();
+            chatFlowTask = null;
+        }
+    }
+
+    private void stopChatFlowTask() {
+        if (chatFlowTask != null) {
+            chatFlowTask.cancel();
+            chatFlowTask = null;
+        }
     }
 }
