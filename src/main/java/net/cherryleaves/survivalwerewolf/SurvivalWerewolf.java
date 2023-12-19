@@ -15,9 +15,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.*;
 
 import java.util.*;
 
@@ -135,10 +134,12 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     ScoreboardManager managerW = Bukkit.getScoreboardManager();
     ScoreboardManager managerV = Bukkit.getScoreboardManager();
     ScoreboardManager managerM = Bukkit.getScoreboardManager();
+    ScoreboardManager ManagerT = Bukkit.getScoreboardManager();
 
     Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
     Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
     Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
+    Scoreboard scoreboardTimer = ManagerT.getMainScoreboard();
 
     public void GameStart(){
         List<Player> Players = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -216,7 +217,35 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
             playerALL5.removeScoreboardTag("Admin1");
         }
-        // startTimer();
+        startTimer();
+    }
+
+    private void updateScoreboard(int timeRemaining) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = Objects.requireNonNull(scoreboardManager).getMainScoreboard();
+        Objective objective = scoreboard.getObjective("timer");
+        if (objective == null) {
+            objective = scoreboard.registerNewObjective("timer", "dummy", "Timer");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        }
+        Score score = objective.getScore("Time Left");
+        score.setScore(timeRemaining);
+    }
+
+    private void startTimer() {
+        BukkitRunnable timerTask = new BukkitRunnable() {
+            int timeRemaining = 60 * 60 * 3;
+            @Override
+            public void run() {
+                if (timeRemaining <= 0) {
+                    cancel(); // タイマー停止
+                    return;
+                }
+                updateScoreboard(timeRemaining);
+                timeRemaining--;
+            }
+        };
+        timerTask.runTaskTimer(this, 0, 20); // 1秒ごとにタイマーを更新
     }
 
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
