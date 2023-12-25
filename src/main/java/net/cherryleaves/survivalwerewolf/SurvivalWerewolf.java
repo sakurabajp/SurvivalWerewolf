@@ -3,9 +3,11 @@ package net.cherryleaves.survivalwerewolf;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -83,9 +85,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
     }
 
+    Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
+
     public void openGUI(Player AdminPlayer) {
         // GUI表示
-        Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
         // 人狼数表示アイテム
         ItemStack WolfPlayerCountItem = new ItemStack(Material.FIRE_CORAL);
         ItemMeta WolfPlayerCountItemMeta = WolfPlayerCountItem.getItemMeta();
@@ -138,10 +141,12 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     ScoreboardManager managerV = Bukkit.getScoreboardManager();
     ScoreboardManager managerM = Bukkit.getScoreboardManager();
     ScoreboardManager ManagerT = Bukkit.getScoreboardManager();
+    ScoreboardManager ManagerT2 = Bukkit.getScoreboardManager();
 
     Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
     Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
     Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
+    Scoreboard scoreboardOurTimer = Objects.requireNonNull(ManagerT2).getMainScoreboard();
     Scoreboard scoreboardTimer = ManagerT.getMainScoreboard();
 
     public void GameStart(){
@@ -220,11 +225,11 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
             playerALL5.removeScoreboardTag("Admin1");
         }
-        startTimer();
+        //startTimer();
         LocateChat();
     }
 
-    private void updateScoreboard(int timeRemaining) {
+    /*private void updateScoreboard(int timeRemaining) {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = Objects.requireNonNull(scoreboardManager).getMainScoreboard();
         Objective objective = scoreboard.getObjective("timer");
@@ -250,7 +255,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
         };
         TimerTask.runTaskTimer(this, 0, 20); // 1秒ごとにタイマーを更新
-    }
+    }*/
 
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         player.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subtitle), fadeIn, stay, fadeOut);
@@ -258,14 +263,12 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerClickInventory(InventoryClickEvent event) {
-
         if (event.getWhoClicked() instanceof Player) {
             Player GUIClickedPlayer = (Player) event.getWhoClicked();
             // クリックされたGUIを取得する
-            Inventory clickedInventory = event.getClickedInventory();
-            /*String ClickedItemName = event.getClick().name();*/
-            String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
-            if (clickedInventory != null && event.getView().getTitle().equals(ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認")) {
+            Inventory clickedInventory = Objects.requireNonNull(event.getClickedInventory());
+            if (clickedInventory == StartGUI) {
+                String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
                 GUIClickedPlayer.addScoreboardTag("Admin1");
                 // クリックされたアイテムを取得する
                 ItemStack clickedItem = event.getCurrentItem();
@@ -274,8 +277,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.0f);
                         if (BeforeWolfPlayerCount > 1) {
                             BeforeWolfPlayerCount += (-1);
-                        }
-                        else{
+                        } else {
                             GUIClickedPlayer.sendMessage(ChatColor.DARK_RED + "人狼の人数を1人未満にすることは出来ません。");
                             GUIClickedPlayer.playSound(Objects.requireNonNull(GUIClickedPlayer).getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.1f);
                         }
@@ -284,30 +286,27 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.0f);
                         if (BeforeMadmanPlayerCount > 0) {
                             BeforeMadmanPlayerCount += (-1);
-                        }
-                        else{
+                        } else {
                             GUIClickedPlayer.sendMessage(ChatColor.DARK_RED + "狂人の人数を0人未満にすることは出来ません。");
                             GUIClickedPlayer.playSound(Objects.requireNonNull(GUIClickedPlayer).getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.1f);
                         }
                         openGUI(Objects.requireNonNull(GUIClickedPlayer));
                     }
-                }
-                else if (clickedItem != null && clickedItem.getType() == Material.BLUE_STAINED_GLASS_PANE){
-                     if (ClickedItemName.equals(ChatColor.BLUE + "クリックで人狼の数を増やす")) {
-                         BeforeWolfPlayerCount += (1);
+                } else if (clickedItem != null && clickedItem.getType() == Material.BLUE_STAINED_GLASS_PANE) {
+                    if (ClickedItemName.equals(ChatColor.BLUE + "クリックで人狼の数を増やす")) {
+                        BeforeWolfPlayerCount += (1);
                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.2f);
                         openGUI(Objects.requireNonNull(GUIClickedPlayer));
+                    } else if (ClickedItemName.equals(ChatColor.BLUE + "クリックで狂人の数を増やす")) {
+                        GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.2f);
+                        BeforeMadmanPlayerCount += (1);
+                        openGUI(Objects.requireNonNull(GUIClickedPlayer));
                     }
-                    else if (ClickedItemName.equals(ChatColor.BLUE + "クリックで狂人の数を増やす")) {
-                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.2f);
-                         BeforeMadmanPlayerCount += (1);
-                         openGUI(Objects.requireNonNull(GUIClickedPlayer));
-                     }
                 }
-                else if (clickedItem != null && clickedItem.getType() == Material.TOTEM_OF_UNDYING){
+                else if (clickedItem != null && clickedItem.getType() == Material.TOTEM_OF_UNDYING) {
                     GameStart();
                 }
-                else{
+                else {
                     GUIClickedPlayer.sendMessage(ChatColor.AQUA + "サンゴに触らないで！！");
                     GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.ENTITY_RABBIT_DEATH, 1.0f, 1.2f);
                 }
@@ -318,14 +317,24 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
         String originalDeathMessage = event.getDeathMessage();
-        // 死亡ログのメッセージを変更する
         String modifiedDeathMessage = "誰かが死亡しました";
-        // 新しい死亡ログメッセージを設定する
         event.setDeathMessage(modifiedDeathMessage);
-        // オリジナルの死亡ログをコンソールに表示する
         getLogger().info(originalDeathMessage);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        // エンダードラゴンを討伐した場合
+        if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+            if (event.getEntity().getKiller() != null) {
+                Player player = (Player) event.getEntity().getKiller();
+                // ダイアモンドを付与する
+                ItemStack diamond = new ItemStack(Material.DIAMOND);
+                player.getInventory().addItem(diamond);
+                player.updateInventory();
+            }
+        }
     }
 
     public void LocateChat(){
