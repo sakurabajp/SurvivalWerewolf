@@ -329,7 +329,11 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
             if (event.getEntity().getKiller() != null) {
                 Player player = (Player) event.getEntity().getKiller();
-                // ダイアモンドを付与する
+                String DragonKillPlayer = player.getName();
+                for (Player playerA : Bukkit.getOnlinePlayers()) {
+                    playerA.sendMessage(DragonKillPlayer + "は挑戦" + ChatColor.DARK_PURPLE + "[村人陣営勝利への貢献]" + ChatColor.RESET + ChatColor.WHITE + "を達成した");
+                    playerA.playSound(playerA.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+                }
                 ItemStack diamond = new ItemStack(Material.DIAMOND);
                 player.getInventory().addItem(diamond);
                 player.updateInventory();
