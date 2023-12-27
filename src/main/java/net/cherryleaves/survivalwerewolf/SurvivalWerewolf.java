@@ -45,7 +45,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        stopChatFlowTask();
+        LocateChatEnd();
+        MainTimerEnd();
         super.onDisable();
     }
 
@@ -71,13 +72,20 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
             }
+            for (Player playerOI : Bukkit.getOnlinePlayers()){
+                playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 2, 1);
+                playerOI.sendMessage(ChatColor.DARK_RED + "ゲームを強制終了させました");
+            }
             LocateChatEnd();
+            MainTimerEnd();
+            Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
+            scoreboard.resetScores("MainTimer");
         }
         return false;
     }
 
     @EventHandler
-    public void onPlayerClickInventory(PlayerJoinEvent Player){
+    public void onPlayerJoinServer(PlayerJoinEvent Player){
         Player.getPlayer().setGameMode(GameMode.ADVENTURE);
         Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
     }
@@ -135,13 +143,13 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     }
 
     public void GameStart(){
-        ScoreboardManager managerW = Bukkit.getScoreboardManager();
-        ScoreboardManager managerV = Bukkit.getScoreboardManager();
-        ScoreboardManager managerM = Bukkit.getScoreboardManager();
+        final ScoreboardManager managerW = Bukkit.getScoreboardManager();
+        final ScoreboardManager managerV = Bukkit.getScoreboardManager();
+        final ScoreboardManager managerM = Bukkit.getScoreboardManager();
 
-        Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
-        Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
-        Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
+        final Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
+        final Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
+        final Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
 
         List<Player> Players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (scoreboardW.getTeam("wolf") != null) {
@@ -218,9 +226,67 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
             playerALL5.removeScoreboardTag("Admin1");
         }
-        //startTimer();
+        startTimer();
         LocateChat();
     }
+
+    int TimerMain = 60 * 60 * 3; // 3時間
+    int TimerHour;
+    int TimerMinutes;
+    int TimerSecond;
+    int CLMain;
+    int CLS;
+    int CLM;
+
+    String bar = "-------------------";
+    String none = " ";
+
+    private void startTimer() {
+        ScoreboardManager managerTime = Bukkit.getScoreboardManager();
+        Scoreboard boardTime = Objects.requireNonNull(managerTime).getNewScoreboard();
+        Objective objectiveT = boardTime.registerNewObjective("MainTimer", "dummy", ChatColor.RED + " Survival-Werewolf ");
+        Objects.requireNonNull(objectiveT).setDisplaySlot(DisplaySlot.SIDEBAR);
+        Score score9 = Objects.requireNonNull(objectiveT).getScore(ChatColor.DARK_GREEN + bar);
+        score9.setScore(9);
+        Score score8 = Objects.requireNonNull(objectiveT).getScore(ChatColor.GOLD + none);
+        score8.setScore(8);
+        Score score7 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "残り時間 : " + ChatColor.RESET + ChatColor.YELLOW + TimerHour + ":" + TimerMinutes + ":" + TimerSecond);
+        score7.setScore(7);
+        Score score6 = Objects.requireNonNull(objectiveT).getScore(none);
+        score6.setScore(6);
+        Score score5 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "次の位置情報まで : " + ChatColor.RESET + ChatColor.LIGHT_PURPLE + CLM + ":" + CLS);
+        score5.setScore(5);
+        Score score4 = Objects.requireNonNull(objectiveT).getScore(ChatColor.RED + none);
+        score4.setScore(4);
+        Score score0 = Objects.requireNonNull(objectiveT).getScore(ChatColor.RESET + "" + ChatColor.DARK_GREEN + bar);
+        score0.setScore(0);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.setScoreboard(boardTime);
+        }
+        TimerM = new BukkitRunnable() {
+            @Override
+            public void run() {
+                boardTime.resetScores(ChatColor.AQUA + "" + ChatColor.BOLD + "残り時間 : " + ChatColor.RESET + ChatColor.YELLOW + TimerHour + ":" + TimerMinutes + ":" + TimerSecond);
+                boardTime.resetScores(ChatColor.AQUA + "" + ChatColor.BOLD + "次の位置情報まで : " + ChatColor.RESET + ChatColor.LIGHT_PURPLE + CLM + ":" + CLS);
+                // メインタイマー
+                TimerHour = TimerMain / 3600;
+                TimerMinutes = (TimerMain - (TimerHour * 3600)) / 60;
+                TimerSecond = (TimerMain - (TimerHour * 3600) - (TimerMinutes * 60));
+                TimerMain = TimerMain - 1;
+                // ロケートチャットタイマー
+                CLMain = TimerMain % 300 + 1;
+                CLM = CLMain / 60;
+                CLS = CLMain - (CLM * 60);
+                Score score7 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "残り時間 : " + ChatColor.RESET + ChatColor.YELLOW + TimerHour + ":" + TimerMinutes + ":" + TimerSecond);
+                score7.setScore(7);
+                Score score5 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "次の位置情報まで : " + ChatColor.RESET + ChatColor.LIGHT_PURPLE + CLM + ":" + CLS);
+                score5.setScore(5);
+            }
+        };
+        TimerM.runTaskTimer(this, 0, 20); // 20 ticks = 1 second
+    }
+
+    public BukkitRunnable TimerM;
 
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         player.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subtitle), fadeIn, stay, fadeOut);
@@ -295,6 +361,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         // エンダードラゴンを討伐した場合
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
+            for (Player playerUI : Bukkit.getOnlinePlayers()){
+                sendTitle(playerUI, "&6村人陣営の勝利", "～エンダードラゴン討伐エンド～", 10, 400, 10);
+            }
             if (event.getEntity().getKiller() != null) {
                 Player player = (Player) event.getEntity().getKiller();
                 String DragonKillPlayer = player.getName();
@@ -306,10 +375,17 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 player.getInventory().addItem(diamond);
                 player.updateInventory();
             }
+            else{
+                for (Player playerA : Bukkit.getOnlinePlayers()){
+                    playerA.sendMessage(ChatColor.BOLD + "何者かがベットでエンダードラゴンを討伐しました...");
+                }
+            }
         }
     }
 
     public BukkitRunnable chatFlowTask;
+
+    String LCPlayer;
 
     public void LocateChat(){
         List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -322,20 +398,21 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 if (randomPlayer.getGameMode() == GameMode.SPECTATOR) {
                     return;
                 }
-                int x = randomPlayer.getLocation().getBlockX();
-                int y = randomPlayer.getLocation().getBlockY();
-                int z = randomPlayer.getLocation().getBlockZ();
+                int LCx = randomPlayer.getLocation().getBlockX();
+                int LCy = randomPlayer.getLocation().getBlockY();
+                int LCz = randomPlayer.getLocation().getBlockZ();
                 Location location = randomPlayer.getLocation();
                 String dimensionName = Objects.requireNonNull(location.getWorld()).getEnvironment().name();
                 for (Player playerA : Bukkit.getOnlinePlayers()) {
                     playerA.playSound(playerA.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 0.1f);
                 }
                 Bukkit.broadcastMessage(ChatColor.YELLOW + "位置情報公開の時間です。");
-                Bukkit.broadcastMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + x + ", Y=" + y + ", Z=" + z + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
+                Bukkit.broadcastMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + LCx + ", Y=" + LCy + ", Z=" + LCz + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
+                LCPlayer = playerName;
             }
         };
         chatFlowTask.runTaskTimer(this, 0, 6000); // 6000 ticks = 5 minutes
-        }
+    }
 
     public void LocateChatEnd(){
         if (chatFlowTask != null) {
@@ -343,11 +420,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             chatFlowTask = null;
         }
     }
-
-    private void stopChatFlowTask() {
-        if (chatFlowTask != null) {
-            chatFlowTask.cancel();
-            chatFlowTask = null;
+    public void MainTimerEnd(){
+        if (TimerM != null) {
+            TimerM.cancel();
+            TimerM = null;
         }
     }
 }
