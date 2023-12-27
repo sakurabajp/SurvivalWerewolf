@@ -24,9 +24,6 @@ import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
-    public BukkitRunnable chatFlowTask;
-    public BukkitRunnable TimerTask;
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -137,19 +134,15 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         AdminPlayer.openInventory(StartGUI);
     }
 
-    ScoreboardManager managerW = Bukkit.getScoreboardManager();
-    ScoreboardManager managerV = Bukkit.getScoreboardManager();
-    ScoreboardManager managerM = Bukkit.getScoreboardManager();
-    ScoreboardManager ManagerT = Bukkit.getScoreboardManager();
-    ScoreboardManager ManagerT2 = Bukkit.getScoreboardManager();
-
-    Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
-    Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
-    Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
-    Scoreboard scoreboardOurTimer = Objects.requireNonNull(ManagerT2).getMainScoreboard();
-    Scoreboard scoreboardTimer = ManagerT.getMainScoreboard();
-
     public void GameStart(){
+        ScoreboardManager managerW = Bukkit.getScoreboardManager();
+        ScoreboardManager managerV = Bukkit.getScoreboardManager();
+        ScoreboardManager managerM = Bukkit.getScoreboardManager();
+
+        Scoreboard scoreboardW = Objects.requireNonNull(managerW).getMainScoreboard();
+        Scoreboard scoreboardV = Objects.requireNonNull(managerV).getMainScoreboard();
+        Scoreboard scoreboardM = Objects.requireNonNull(managerM).getMainScoreboard();
+
         List<Player> Players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (scoreboardW.getTeam("wolf") != null) {
             Objects.requireNonNull(scoreboardW.getTeam("wolf")).unregister();
@@ -229,34 +222,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         LocateChat();
     }
 
-    /*private void updateScoreboard(int timeRemaining) {
-        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-        Scoreboard scoreboard = Objects.requireNonNull(scoreboardManager).getMainScoreboard();
-        Objective objective = scoreboard.getObjective("timer");
-        if (objective == null) {
-            objective = scoreboard.registerNewObjective("timer", "dummy", "Timer");
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        }
-        Score score = objective.getScore("Time Left");
-        score.setScore(timeRemaining);
-    }
-
-    private void startTimer() {
-        TimerTask = new BukkitRunnable() {
-            int timeRemaining = 60 * 60 * 3;
-            @Override
-            public void run() {
-                if (timeRemaining <= 0) {
-                    cancel(); // タイマー停止
-                    return;
-                }
-                updateScoreboard(timeRemaining);
-                timeRemaining--;
-            }
-        };
-        TimerTask.runTaskTimer(this, 0, 20); // 1秒ごとにタイマーを更新
-    }*/
-
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         player.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subtitle), fadeIn, stay, fadeOut);
     }
@@ -321,6 +286,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         String modifiedDeathMessage = "誰かが死亡しました";
         event.setDeathMessage(modifiedDeathMessage);
         getLogger().info(originalDeathMessage);
+        Player DeathPlayer = event.getEntity().getPlayer();
+        assert DeathPlayer != null;
+        DeathPlayer.setGameMode(GameMode.SPECTATOR);
     }
 
     @EventHandler
@@ -340,6 +308,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
         }
     }
+
+    public BukkitRunnable chatFlowTask;
 
     public void LocateChat(){
         List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
