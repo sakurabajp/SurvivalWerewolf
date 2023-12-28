@@ -1,8 +1,10 @@
 package net.cherryleaves.survivalwerewolf;
 
+import jdk.jfr.internal.tool.Main;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -40,6 +43,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         getLogger().info(ChatColor.GREEN + "ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー");
         Objects.requireNonNull(getCommand("startgame")).setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(new Item(), this);
+        getServer().getPluginManager().registerEvents(new ItemSystem(), this);
+        getServer().resetRecipes();
     }
 
     @Override
@@ -73,13 +79,30 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 return true;
             }
             for (Player playerOI : Bukkit.getOnlinePlayers()){
-                playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 2, 1);
+                playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 5, 1);
                 playerOI.sendMessage(ChatColor.DARK_RED + "ゲームを強制終了させました");
             }
             LocateChatEnd();
             MainTimerEnd();
             Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
             scoreboard.resetScores("MainTimer");
+        }
+        if (command.getName().equalsIgnoreCase("resetgame")) {
+            if (!(sender instanceof Player) || !sender.isOp()) {
+                sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                return true;
+            }
+            for (Player playerOI : Bukkit.getOnlinePlayers()){
+                playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 5, 1);
+                playerOI.sendMessage(ChatColor.DARK_RED + "ゲームをリセットします");
+            }
+            LocateChatEnd();
+            MainTimerEnd();
+            Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
+            scoreboard.resetScores("MainTimer");
+            TimerMain = 60 * 60 * 3;
+            // ロケートチャットタイマー
+            CLMain = 300;
         }
         return false;
     }
@@ -142,6 +165,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         AdminPlayer.openInventory(StartGUI);
     }
 
+    int VillagerCount;
+    int ALLPlayerCount;
+
     public void GameStart(){
         final ScoreboardManager managerW = Bukkit.getScoreboardManager();
         final ScoreboardManager managerV = Bukkit.getScoreboardManager();
@@ -196,6 +222,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             MadmanTeamPlayers.sendMessage("貴方は狂人に選ばれました");
         }
         for (Player playerALL5 : Bukkit.getOnlinePlayers()) {
+            ALLPlayerCount++;
             playerALL5.setGameMode(GameMode.SURVIVAL);
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 80, true, false));
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10, 80, true, false));
@@ -226,6 +253,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
             playerALL5.removeScoreboardTag("Admin1");
         }
+        VillagerCount = ALLPlayerCount - BeforeWolfPlayerCount - BeforeMadmanPlayerCount;
         startTimer();
         LocateChat();
     }
@@ -281,6 +309,19 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 score7.setScore(7);
                 Score score5 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "次の位置情報まで : " + ChatColor.RESET + ChatColor.LIGHT_PURPLE + CLM + ":" + CLS);
                 score5.setScore(5);
+                for (Player playerA : Bukkit.getOnlinePlayers()) {
+                    playerA.setScoreboard(boardTime);
+                }
+                if (TimerMain < 0){
+                    MainTimerEnd();
+                    LocateChatEnd();
+                    WolfWin();
+                }
+                if (VillagerCount <= 0){
+                    MainTimerEnd();
+                    LocateChatEnd();
+                    WolfWin();
+                }
             }
         };
         TimerM.runTaskTimer(this, 0, 20); // 20 ticks = 1 second
@@ -355,6 +396,19 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Player DeathPlayer = event.getEntity().getPlayer();
         assert DeathPlayer != null;
         DeathPlayer.setGameMode(GameMode.SPECTATOR);
+
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team team = scoreboard.getEntryTeam(DeathPlayer.getName());
+        if (team != null && team.getName().equals("villager")) {
+            VillagerCount = VillagerCount - 1;
+        }
+    }
+
+    public void WolfWin(){
+        for (Player playerUI : Bukkit.getOnlinePlayers()){
+            sendTitle(playerUI, "&4人狼陣営の勝利","" , 10, 400, 10);
+            playerUI.playSound(playerUI.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+        }
     }
 
     @EventHandler
@@ -362,7 +416,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         // エンダードラゴンを討伐した場合
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
             for (Player playerUI : Bukkit.getOnlinePlayers()){
-                sendTitle(playerUI, "&6村人陣営の勝利", "～エンダードラゴン討伐エンド～", 10, 400, 10);
+                sendTitle(playerUI, "&6村人陣営の勝利", "", 10, 400, 10);
             }
             if (event.getEntity().getKiller() != null) {
                 Player player = (Player) event.getEntity().getKiller();

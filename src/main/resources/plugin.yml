@@ -8,3 +8,5 @@ commands:
     description: start SurvivalWerewolf game.
   stopgame:
     description: stop the game.
+  resetgame:
+    description: reset the game.
