@@ -76,7 +76,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
             }
-            for (Player playerOI : Bukkit.getOnlinePlayers()){
+            for (Player playerOI : Bukkit.getOnlinePlayers()) {
                 playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 5, 1);
                 playerOI.sendMessage(ChatColor.DARK_RED + "ゲームを強制終了させました");
             }
@@ -90,7 +90,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
             }
-            for (Player playerOI : Bukkit.getOnlinePlayers()){
+            for (Player playerOI : Bukkit.getOnlinePlayers()) {
                 playerOI.playSound(playerOI.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, (float) 1 / 5, 1);
                 playerOI.sendMessage(ChatColor.DARK_RED + "ゲームをリセットします");
             }
@@ -104,7 +104,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoinServer(PlayerJoinEvent Player){
+    public void onPlayerJoinServer(PlayerJoinEvent Player) {
         Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
     }
 
@@ -163,7 +163,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     int VillagerCount;
     int ALLPlayerCount;
 
-    public void GameStart(){
+    public void GameStart() {
         final ScoreboardManager managerW = Bukkit.getScoreboardManager();
         final ScoreboardManager managerV = Bukkit.getScoreboardManager();
         final ScoreboardManager managerM = Bukkit.getScoreboardManager();
@@ -195,7 +195,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         for (int i = BeforeWolfPlayerCount; i > 0; i += -1) {
             Random random = new Random();
             Player WolfTeamPlayers = Players.get(random.nextInt(Players.size()));
-            if (teamW.hasEntry(WolfTeamPlayers.getName())){
+            if (teamW.hasEntry(WolfTeamPlayers.getName())) {
                 WolfTeamPlayers.sendMessage("貴方はすでに人狼チームに所属しているため再抽選が行われます");
                 return;
             }
@@ -205,11 +205,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         for (int i = BeforeMadmanPlayerCount; i > 0; i += -1) {
             Random random = new Random();
             Player MadmanTeamPlayers = Players.get(random.nextInt(Players.size()));
-            if (teamM.hasEntry(MadmanTeamPlayers.getName())){
+            if (teamM.hasEntry(MadmanTeamPlayers.getName())) {
                 MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
                 return;
-            }
-            else if (teamW.hasEntry(MadmanTeamPlayers.getName())){
+            } else if (teamW.hasEntry(MadmanTeamPlayers.getName())) {
                 MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
                 return;
             }
@@ -222,7 +221,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 10, 80, true, false));
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10, 80, true, false));
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 5, true, false));
-            playerALL5.playSound(playerALL5.getLocation(), Sound.ENTITY_WITHER_SPAWN , 0.5f, 1.0f);
+            playerALL5.playSound(playerALL5.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.0f);
             playerALL5.getInventory().clear();
             sendTitle(playerALL5, "&6ゲームスタート！", "", 10, 40, 10);
             playerALL5.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
@@ -308,12 +307,12 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 for (Player playerA : Bukkit.getOnlinePlayers()) {
                     playerA.setScoreboard(boardTime);
                 }
-                if (TimerMain < 0){
+                if (TimerMain < 0) {
                     MainTimerEnd();
                     LocateChatEnd();
                     WolfWin();
                 }
-                if (VillagerCount <= 0){
+                if (VillagerCount <= 0) {
                     MainTimerEnd();
                     LocateChatEnd();
                     WolfWin();
@@ -370,11 +369,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         BeforeMadmanPlayerCount += (1);
                         openGUI(Objects.requireNonNull(GUIClickedPlayer));
                     }
-                }
-                else if (clickedItem != null && clickedItem.getType() == Material.TOTEM_OF_UNDYING) {
+                } else if (clickedItem != null && clickedItem.getType() == Material.TOTEM_OF_UNDYING) {
                     GameStart();
-                }
-                else {
+                } else {
                     GUIClickedPlayer.sendMessage(ChatColor.AQUA + "サンゴに触らないで！！");
                     GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.ENTITY_RABBIT_DEATH, 1.0f, 1.2f);
                 }
@@ -405,9 +402,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         }
     }
 
-    public void WolfWin(){
-        for (Player playerUI : Bukkit.getOnlinePlayers()){
-            sendTitle(playerUI, "&4人狼陣営の勝利","" , 10, 400, 10);
+    public void WolfWin() {
+        for (Player playerUI : Bukkit.getOnlinePlayers()) {
+            sendTitle(playerUI, "&4人狼陣営の勝利", "", 10, 400, 10);
             playerUI.playSound(playerUI.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
         }
     }
@@ -416,7 +413,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         // エンダードラゴンを討伐した場合
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-            for (Player playerUI : Bukkit.getOnlinePlayers()){
+            for (Player playerUI : Bukkit.getOnlinePlayers()) {
                 sendTitle(playerUI, "&6村人陣営の勝利", "", 10, 400, 10);
             }
             if (event.getEntity().getKiller() != null) {
@@ -429,9 +426,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 ItemStack diamond = new ItemStack(Material.DIAMOND);
                 player.getInventory().addItem(diamond);
                 player.updateInventory();
-            }
-            else{
-                for (Player playerA : Bukkit.getOnlinePlayers()){
+            } else {
+                for (Player playerA : Bukkit.getOnlinePlayers()) {
                     playerA.sendMessage(ChatColor.BOLD + "何者かがベットでエンダードラゴンを討伐しました...");
                 }
             }
@@ -444,7 +440,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     String LCPlayer;
 
-    public void LocateChat(){
+    public void LocateChat() {
         List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         chatFlowTask = new BukkitRunnable() {
             @Override
@@ -475,7 +471,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     public void onPlayerDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if (player.getGameMode() == GameMode.SPECTATOR){
+            if (player.getGameMode() == GameMode.SPECTATOR) {
                 if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
                     teleportToSurface(player);
                     event.setCancelled(true);
@@ -483,6 +479,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
         }
     }
+
     private void teleportToSurface(Player player) {
         World world = player.getWorld();
         Location surfaceLocation = world.getHighestBlockAt(player.getLocation()).getLocation();
@@ -490,20 +487,21 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         player.teleport(surfaceLocation);
     }
 
-    public void LocateChatEnd(){
+    public void LocateChatEnd() {
         if (chatFlowTask != null) {
             chatFlowTask.cancel();
             chatFlowTask = null;
         }
     }
-    public void MainTimerEnd(){
+
+    public void MainTimerEnd() {
         if (TimerM != null) {
             TimerM.cancel();
             TimerM = null;
         }
     }
 
-    public void CountReset(){
+    public void CountReset() {
         TimerMain = 60 * 60 * 3;
         CLMain = 300;
         VillagerCount = 0;
