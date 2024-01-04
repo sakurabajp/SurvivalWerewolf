@@ -1,5 +1,6 @@
 package net.cherryleaves.survivalwerewolf;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -30,6 +31,7 @@ public class Item implements Listener {
         recipeA.setIngredient('B', Material.DIAMOND); // 材料 B ダイヤモンド
         recipeA.setIngredient('C', Material.IRON_BLOCK); // 材料 C 空気
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeA);
         return recipeA;
     }
 
@@ -50,6 +52,7 @@ public class Item implements Listener {
         recipeB.setIngredient('4', Material.GOLD_NUGGET);
         recipeB.setIngredient('5', Material.SOUL_LANTERN);
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeB);
         return recipeB;
     }
 
@@ -70,6 +73,7 @@ public class Item implements Listener {
         recipeC.setIngredient('D', Material.IRON_BLOCK);
         recipeC.setIngredient('E', Material.REDSTONE);
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeC);
         return recipeC;
     }
 
@@ -89,6 +93,7 @@ public class Item implements Listener {
         recipeD.setIngredient('C', Material.LANTERN); // 材料 C ランタン
         recipeD.setIngredient('D', Material.NETHERRACK); // 材料 C ネザーラック
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeD);
         return recipeD;
     }
 
@@ -105,6 +110,7 @@ public class Item implements Listener {
         recipeE.setIngredient('A', Material.GOLD_BLOCK); // 材料 A 金ブロック
         recipeE.setIngredient('B', Material.APPLE); // 材料 B りんご
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeE);
         return recipeE;
     }
 
@@ -123,6 +129,7 @@ public class Item implements Listener {
         recipeF.setIngredient('B', Material.GLASS_PANE); // 材料 B ダイヤモンド
         recipeF.setIngredient('C', Material.SUGAR); // 材料 C 空気
         // レシピを登録
+        Bukkit.getServer().addRecipe(recipeF);
         return recipeF;
     }
 }

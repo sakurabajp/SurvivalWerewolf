@@ -1,21 +1,19 @@
 package net.cherryleaves.survivalwerewolf;
 
-import jdk.jfr.internal.tool.Main;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -45,7 +43,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Item(), this);
         getServer().getPluginManager().registerEvents(new ItemSystem(), this);
-        getServer().resetRecipes();
     }
 
     @Override
@@ -63,6 +60,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("startgame")) {
+            CountReset();
             if (!(sender instanceof Player) || !sender.isOp()) {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
@@ -100,17 +98,32 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             MainTimerEnd();
             Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
             scoreboard.resetScores("MainTimer");
-            TimerMain = 60 * 60 * 3;
-            // ロケートチャットタイマー
-            CLMain = 300;
+            CountReset();
         }
         return false;
     }
 
     @EventHandler
     public void onPlayerJoinServer(PlayerJoinEvent Player){
-        Player.getPlayer().setGameMode(GameMode.ADVENTURE);
         Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
+        /*Player p = Player.getPlayer();
+
+        p.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
+        p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "ゲームスタート！");
+        p.sendMessage("");
+        p.sendMessage(ChatColor.AQUA + "制限時間は" + ChatColor.RESET + ChatColor.GOLD + "3時間" + ChatColor.RESET + ChatColor.AQUA + "です");
+        p.sendMessage("");
+        if (teamV.hasEntry(p.getName())) {
+            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.GREEN + "村人陣営" + ChatColor.DARK_AQUA + "です");
+        }
+        if (teamW.hasEntry(p.getName())) {
+            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.RED + "人狼陣営" + ChatColor.DARK_AQUA + "です");
+            p.sendMessage(ChatColor.DARK_AQUA + "仲間は" + ChatColor.RED + teamW.getEntries() + ChatColor.DARK_AQUA + "です");
+        }
+        if (teamM.hasEntry(p.getName())) {
+            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.LIGHT_PURPLE + "狂人陣営" + ChatColor.DARK_AQUA + "です");
+        }
+        p.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");*/
     }
 
     Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
@@ -252,8 +265,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 }
             }
             playerALL5.removeScoreboardTag("Admin1");
+            playerALL5.setStatistic(org.bukkit.Statistic.DEATHS, 0);
         }
-        VillagerCount = ALLPlayerCount - BeforeWolfPlayerCount - BeforeMadmanPlayerCount;
+        VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount - BeforeMadmanPlayerCount);
         startTimer();
         LocateChat();
     }
@@ -395,12 +409,17 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         getLogger().info(originalDeathMessage);
         Player DeathPlayer = event.getEntity().getPlayer();
         assert DeathPlayer != null;
-        DeathPlayer.setGameMode(GameMode.SPECTATOR);
 
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         Team team = scoreboard.getEntryTeam(DeathPlayer.getName());
         if (team != null && team.getName().equals("villager")) {
             VillagerCount = VillagerCount - 1;
+        }
+        /*if (team != null && team.getName().equals("madman")) {
+            DeathPlayer.setGameMode(GameMode.SPECTATOR);
+        }*/
+        if (DeathPlayer.getStatistic(org.bukkit.Statistic.DEATHS) >= 1) {
+            DeathPlayer.setGameMode(GameMode.SPECTATOR);
         }
     }
 
@@ -434,6 +453,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     playerA.sendMessage(ChatColor.BOLD + "何者かがベットでエンダードラゴンを討伐しました...");
                 }
             }
+            LocateChatEnd();
+            MainTimerEnd();
         }
     }
 
@@ -468,6 +489,25 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         chatFlowTask.runTaskTimer(this, 0, 6000); // 6000 ticks = 5 minutes
     }
 
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            if (player.getGameMode() == GameMode.SPECTATOR){
+                if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                    teleportToSurface(player);
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+    private void teleportToSurface(Player player) {
+        World world = player.getWorld();
+        Location surfaceLocation = world.getHighestBlockAt(player.getLocation()).getLocation();
+        surfaceLocation.setY(surfaceLocation.getY() + 1);
+        player.teleport(surfaceLocation);
+    }
+
     public void LocateChatEnd(){
         if (chatFlowTask != null) {
             chatFlowTask.cancel();
@@ -479,5 +519,14 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             TimerM.cancel();
             TimerM = null;
         }
+    }
+
+    public void CountReset(){
+        TimerMain = 60 * 60 * 3;
+        CLMain = 300;
+        VillagerCount = 0;
+        ALLPlayerCount = 0;
+        BeforeWolfPlayerCount = 1;
+        BeforeMadmanPlayerCount = 0;
     }
 }
