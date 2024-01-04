@@ -106,24 +106,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoinServer(PlayerJoinEvent Player){
         Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
-        /*Player p = Player.getPlayer();
-
-        p.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
-        p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "ゲームスタート！");
-        p.sendMessage("");
-        p.sendMessage(ChatColor.AQUA + "制限時間は" + ChatColor.RESET + ChatColor.GOLD + "3時間" + ChatColor.RESET + ChatColor.AQUA + "です");
-        p.sendMessage("");
-        if (teamV.hasEntry(p.getName())) {
-            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.GREEN + "村人陣営" + ChatColor.DARK_AQUA + "です");
-        }
-        if (teamW.hasEntry(p.getName())) {
-            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.RED + "人狼陣営" + ChatColor.DARK_AQUA + "です");
-            p.sendMessage(ChatColor.DARK_AQUA + "仲間は" + ChatColor.RED + teamW.getEntries() + ChatColor.DARK_AQUA + "です");
-        }
-        if (teamM.hasEntry(p.getName())) {
-            p.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.LIGHT_PURPLE + "狂人陣営" + ChatColor.DARK_AQUA + "です");
-        }
-        p.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");*/
     }
 
     Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
