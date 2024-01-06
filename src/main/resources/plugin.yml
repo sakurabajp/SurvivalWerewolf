@@ -6,6 +6,8 @@ authors: [ sakuraba_jp ]
 commands:
   startgame:
     description: start SurvivalWerewolf game.
+  restartgame:
+      description: restart SurvivalWerewolf game.
   stopgame:
     description: stop the game.
   resetgame:

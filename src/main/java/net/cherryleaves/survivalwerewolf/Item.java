@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
@@ -16,34 +17,14 @@ import static org.bukkit.Bukkit.getServer;
 
 public class Item implements Listener {
 
-    public ShapedRecipe getRecipeA(){
-        ItemStack itemA = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
-        ItemMeta metaA = itemA.getItemMeta(); // metaを登録
-        Objects.requireNonNull(metaA).setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "残機回復");
-        itemA.setItemMeta(metaA);
-
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
-        NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "Recovery");
-        ShapedRecipe recipeA = new ShapedRecipe(key, itemA); // レシピオブジェクトの作成
-        // レシピの形状を設定
-        recipeA.shape("ABA", "BCB", "ABA");
-        recipeA.setIngredient('A', Material.QUARTZ); // 材料 A クウォーツ
-        recipeA.setIngredient('B', Material.DIAMOND); // 材料 B ダイヤモンド
-        recipeA.setIngredient('C', Material.IRON_BLOCK); // 材料 C 空気
-        // レシピを登録
-        Bukkit.getServer().addRecipe(recipeA);
-        return recipeA;
-    }
-
-    public ShapedRecipe getRecipeB(){
+    public static void getRecipe(JavaPlugin plugin){
+        // ここからアイテムB
         ItemStack itemB = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaB = itemB.getItemMeta(); // metaを登録
         Objects.requireNonNull(metaB).setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "エンダーパール入手本");
         itemB.setItemMeta(metaB);
-
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
-        NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "EnderP");
-        ShapedRecipe recipeB = new ShapedRecipe(key, itemB); // レシピオブジェクトの作成
+        NamespacedKey keyB = new NamespacedKey(Objects.requireNonNull(plugin), "EnderP");
+        ShapedRecipe recipeB = new ShapedRecipe(keyB, itemB); // レシピオブジェクトの作成
         // レシピの形状を設定
         recipeB.shape("121", "232", "454");
         recipeB.setIngredient('1', Material.STONE_BRICKS);
@@ -52,38 +33,32 @@ public class Item implements Listener {
         recipeB.setIngredient('4', Material.GOLD_NUGGET);
         recipeB.setIngredient('5', Material.SOUL_LANTERN);
         // レシピを登録
-        Bukkit.getServer().addRecipe(recipeB);
-        return recipeB;
-    }
+        plugin.getServer().addRecipe(recipeB);
 
-    public ShapedRecipe getRecipeC(){
+        // アイテムC
         ItemStack itemC = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaC = itemC.getItemMeta(); // metaを登録
         Objects.requireNonNull(metaC).setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "復活本");
         itemC.setItemMeta(metaC);
-
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
-        NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "FukkatsuBook");
-        ShapedRecipe recipeC = new ShapedRecipe(key, itemC); // レシピオブジェクトの作成
+        NamespacedKey keyC = new NamespacedKey(Objects.requireNonNull(plugin), "FukkatsuBook");
+        ShapedRecipe recipeC = new ShapedRecipe(keyC, itemC); // レシピオブジェクトの作成
         // レシピの形状を設定
-        recipeC.shape("AAA", "BCB", "DED");
-        recipeC.setIngredient('A', Material.GOLD_INGOT);
-        recipeC.setIngredient('B', Material.GLASS_PANE);
-        recipeC.setIngredient('C', Material.DIAMOND);
-        recipeC.setIngredient('D', Material.IRON_BLOCK);
-        recipeC.setIngredient('E', Material.REDSTONE);
+        recipeC.shape("666", "787", "909");
+        recipeC.setIngredient('6', Material.GOLD_INGOT);
+        recipeC.setIngredient('7', Material.GLASS_PANE);
+        recipeC.setIngredient('8', Material.DIAMOND);
+        recipeC.setIngredient('9', Material.IRON_BLOCK);
+        recipeC.setIngredient('0', Material.REDSTONE);
         // レシピを登録
         Bukkit.getServer().addRecipe(recipeC);
-        return recipeC;
     }
 
-    public ShapedRecipe getRecipeD(){
+    public static void getRecipeD(JavaPlugin plugin){
         ItemStack itemD = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaD = itemD.getItemMeta(); // metaを登録
         Objects.requireNonNull(metaD).setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "盲目本");
         itemD.setItemMeta(metaD);
 
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
         NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "WolfBook");
         ShapedRecipe recipeD = new ShapedRecipe(key, itemD); // レシピオブジェクトの作成
         // レシピの形状を設定
@@ -94,15 +69,13 @@ public class Item implements Listener {
         recipeD.setIngredient('D', Material.NETHERRACK); // 材料 C ネザーラック
         // レシピを登録
         Bukkit.getServer().addRecipe(recipeD);
-        return recipeD;
     }
 
-    public ShapedRecipe getRecipeE(){
+    public static void getRecipeE(JavaPlugin plugin){
         ItemStack itemE = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1); // アイテムを作る
         ItemMeta metaE = itemE.getItemMeta(); // metaを登録
         itemE.setItemMeta(metaE);
 
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
         NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "Gapple");
         ShapedRecipe recipeE = new ShapedRecipe(key, itemE); // レシピオブジェクトの作成
         // レシピの形状を設定
@@ -111,16 +84,14 @@ public class Item implements Listener {
         recipeE.setIngredient('B', Material.APPLE); // 材料 B りんご
         // レシピを登録
         Bukkit.getServer().addRecipe(recipeE);
-        return recipeE;
     }
 
-    public ShapedRecipe getRecipeF(){
+    public static void getRecipeF(JavaPlugin plugin){
         ItemStack item = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta meta = item.getItemMeta(); // metaを登録
         Objects.requireNonNull(meta).setDisplayName(ChatColor.WHITE + "" + ChatColor.BOLD + "透明化");
         item.setItemMeta(meta);
 
-        Plugin plugin = getServer().getPluginManager().getPlugin("KorunPlugin1");
         NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "Invisible");
         ShapedRecipe recipeF = new ShapedRecipe(key, item); // レシピオブジェクトの作成
         // レシピの形状を設定
@@ -130,6 +101,5 @@ public class Item implements Listener {
         recipeF.setIngredient('C', Material.SUGAR); // 材料 C 空気
         // レシピを登録
         Bukkit.getServer().addRecipe(recipeF);
-        return recipeF;
     }
 }

@@ -11,10 +11,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -28,6 +31,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        getServer().resetRecipes();
         super.onEnable();
         getLogger().info(ChatColor.GREEN + "ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー");
         getLogger().info(ChatColor.AQUA + "Minecraft Survival Werewolf plugin activated!!!!!!!!!!!");
@@ -42,7 +46,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("startgame")).setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new Item(), this);
-        getServer().getPluginManager().registerEvents(new ItemSystem(), this);
+        Item.getRecipe(this);
+        Item.getRecipeD(this);
+        Item.getRecipeE(this);
+        Item.getRecipeF(this);
     }
 
     @Override
@@ -50,6 +57,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         // Plugin shutdown logic
         LocateChatEnd();
         MainTimerEnd();
+        getServer().resetRecipes();
         super.onDisable();
     }
 
@@ -70,6 +78,14 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             assert AdminPlayer != null;
             AdminPlayer.playSound(AdminPlayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.7f, 1.0f);
             openGUI(Objects.requireNonNull(AdminPlayer));
+        }
+        if (command.getName().equalsIgnoreCase("restartgame")) {
+            CountReset();
+            if (!(sender instanceof Player) || !sender.isOp()) {
+                sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+                return true;
+            }
+            GameStart();
         }
         if (command.getName().equalsIgnoreCase("stopgame")) {
             if (!(sender instanceof Player) || !sender.isOp()) {
@@ -333,7 +349,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             Player GUIClickedPlayer = (Player) event.getWhoClicked();
             // クリックされたGUIを取得する
-            Inventory clickedInventory = Objects.requireNonNull(event.getClickedInventory());
+            Inventory clickedInventory = event.getClickedInventory();
             if (clickedInventory == StartGUI) {
                 String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
                 GUIClickedPlayer.addScoreboardTag("Admin1");
@@ -377,6 +393,48 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 }
                 event.setCancelled(true);
             }
+            else if (clickedInventory == guiQ) {
+                // クリックされたアイテムを取得する
+                ItemStack clickedItem = event.getCurrentItem();
+                if (clickedItem != null && clickedItem.getType() == Material.PLAYER_HEAD) {
+                    // アイテムの名前を取得する
+                    String itemName = Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName();
+                    // 名前がnullでなければ、名前をコンソールに表示する
+                    String playerName = clickedItem.getItemMeta().getDisplayName();
+                    Player player = Bukkit.getPlayer(playerName);
+                    GUIClickedPlayer.sendMessage(ChatColor.BOLD + "" + ChatColor.GOLD + itemName + ChatColor.RED + " が10秒後に復活します");
+                    GUIClickedPlayer.playSound(Objects.requireNonNull(player).getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.0f, 2.0f);
+                    Objects.requireNonNull(GUIClickedPlayer.getLocation().getWorld()).spawnParticle(Particle.PORTAL, GUIClickedPlayer.getLocation(), 2000);
+                    if (player.getGameMode().equals(GameMode.SPECTATOR)){
+                        player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_RED + "あなたは復活の本により後10秒で復活します");
+                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                player.teleport(GUIClickedPlayer.getLocation());
+                                player.setGameMode(GameMode.SURVIVAL);
+                                player.sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "復活しました");
+                                player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 1.0f);
+                            }
+                        }.runTaskLater(this, 200L); // 10秒後に実行（1秒は20L）
+                    }
+                    if (player.getGameMode().equals(GameMode.SURVIVAL)) {
+                        // スコアボード処理
+                        player.sendMessage(ChatColor.BOLD + "" + ChatColor.GOLD + "あなたは誰かに復活本を使われたため、残機を回復します");
+                        player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 0.5f, 1.0f);
+                    }
+                    GUIClickedPlayer.closeInventory();
+                    ItemStack itemStack1 = new ItemStack(Material.AIR);
+                    GUIClickedPlayer.getInventory().setItemInMainHand(itemStack1);
+                    player.decrementStatistic(Statistic.DEATHS);
+                    event.setCancelled(true);
+                }
+                else {
+                    event.setCancelled(true);
+                    GUIClickedPlayer.playSound(Objects.requireNonNull(GUIClickedPlayer).getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.1f);
+                    GUIClickedPlayer.sendMessage(ChatColor.GOLD + "復活本" + ChatColor.RED + "のメニューを操作することはできません");
+                }
+            }
         }
     }
 
@@ -399,6 +457,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         }*/
         if (DeathPlayer.getStatistic(org.bukkit.Statistic.DEATHS) >= 1) {
             DeathPlayer.setGameMode(GameMode.SPECTATOR);
+        }
+        for (Player playerUI : Bukkit.getOnlinePlayers()) {
+            sendTitle(playerUI, "誰かが死亡しました", "", 20, 100, 20);
         }
     }
 
@@ -508,5 +569,106 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         ALLPlayerCount = 0;
         BeforeWolfPlayerCount = 1;
         BeforeMadmanPlayerCount = 0;
+    }
+
+    // GUI作る
+    Inventory guiQ = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "復活させたいプレイヤーを選択");
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        Location location = player.getLocation();
+        ItemStack itemStack1 = new ItemStack(Material.AIR);
+        ItemStack item = player.getInventory().getItemInMainHand();
+
+        if (event.getAction().toString().contains("RIGHT_CLICK")) {
+            if (player.getInventory().getItemInMainHand().getType() == Material.KNOWLEDGE_BOOK) {
+                if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.AQUA + "" + ChatColor.BOLD + "エンダーパール入手本")) {
+                    // プレイヤーにメッセージを表示する
+                    player.sendMessage(ChatColor.AQUA + "エンダーパールが入手できたよ！やったね！");
+                    // 効果音を鳴らす
+                    player.playSound(player.getLocation(), Sound.UI_TOAST_IN, 1.0f, 1.0f);
+                    player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.0f);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.7f, 1.0f);
+                    // パーティクルを表示する
+                    Objects.requireNonNull(location.getWorld()).spawnParticle(Particle.ENCHANTMENT_TABLE, location, 1000);
+                    // アイテムを消す
+                    player.getInventory().setItemInMainHand(itemStack1);
+                    // エンダーパールを渡す
+                    ItemStack EnderP = new ItemStack(Material.ENDER_PEARL, 4);
+                    player.getWorld().dropItem(location, EnderP);
+                }
+                if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.GOLD + "" + ChatColor.BOLD + "復活本")) {
+                    event.setCancelled(true);
+                    // 効果音を鳴らす
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 0.7f, 1.0f);
+                    guiQ.clear();
+                    for (Player playerATL : Bukkit.getOnlinePlayers()) {
+                        // 新しい空の紙を作成する
+                        ItemStack PlayerNamePaper = new ItemStack(Material.PLAYER_HEAD, 1);
+                        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD);
+                        SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
+                        Objects.requireNonNull(meta).setOwningPlayer(playerATL);
+                        playerHead.setItemMeta(meta);
+                        Objects.requireNonNull(meta).setDisplayName(playerATL.getName());
+                        PlayerNamePaper.setItemMeta(meta);
+                        // GUIにアイテムを追加
+                        guiQ.addItem(PlayerNamePaper);
+                    }
+                    player.openInventory(guiQ);
+                }
+                if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.WHITE + "" + ChatColor.BOLD + "透明化")) {
+                    Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+                    Team team = scoreboard.getTeam("wolf");
+                    if(team != null && team.hasEntry(player.getName())) {
+                        // プレイヤーにメッセージを表示する
+                        player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "透明化！");
+                        // 効果音を鳴らす
+                        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
+                        // アイテムを消す
+                        player.getInventory().setItemInMainHand(itemStack1);
+                        // 透明化！
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 10, 1));
+                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * 5, 3));
+                    }
+                    else{
+                        player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "透明本は人狼でないと使うことが出来ません");
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, 1.0f, 2.0f);
+                        event.setCancelled(true);
+                    }
+                }
+                if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "盲目本")) {
+                    Scoreboard scoreboardA = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+                    Team teamA = scoreboardA.getTeam("wolf");
+                    if(teamA != null && teamA.hasEntry(player.getName())) {
+                        // プレイヤーにメッセージを表示する
+                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "村人陣営を盲目にさせました");
+                        // 効果音を鳴らす
+                        player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.5f, 1.0f);
+                        // パーティクルを表示する
+                        // Objects.requireNonNull(location.getWorld()).spawnParticle(Particle.BLOCK_DUST, location, 1000);
+                        // アイテムを消す
+                        player.getInventory().setItemInMainHand(itemStack1);
+                        // 村人に盲目を与える
+                        // Player playerABBD = event.getPlayer();
+                        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+                        Team team = scoreboard.getTeam("villager");
+                        for (String playerName : Objects.requireNonNull(team).getEntries()) {
+                            Player playerABBD = Bukkit.getPlayer(playerName);
+                            if (playerABBD != null) {
+                                playerABBD.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 30, 1));
+                            }
+                        }
+                        Team teamF = scoreboard.getTeam("madman");
+                        for (String playerName : Objects.requireNonNull(teamF).getEntries()) {
+                            Player playerABBD = Bukkit.getPlayer(playerName);
+                            if (playerABBD != null) {
+                                playerABBD.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20 * 30, 1));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
