@@ -205,31 +205,31 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         teamW.setSuffix("[←この人は人狼です]");
         teamV.setSuffix("[←この人は村人です]");
         for (Player playerACC : Bukkit.getOnlinePlayers()) {
-            playerACC.sendMessage("貴方を村人チームに追加しました");
+            // playerACC.sendMessage("貴方を村人チームに追加しました");
             teamV.addPlayer(playerACC);
         }
         for (int i = BeforeWolfPlayerCount; i > 0; i += -1) {
             Random random = new Random();
             Player WolfTeamPlayers = Players.get(random.nextInt(Players.size()));
             if (teamW.hasEntry(WolfTeamPlayers.getName())) {
-                WolfTeamPlayers.sendMessage("貴方はすでに人狼チームに所属しているため再抽選が行われます");
+                // WolfTeamPlayers.sendMessage("貴方はすでに人狼チームに所属しているため再抽選が行われます");
                 return;
             }
             teamW.addPlayer(WolfTeamPlayers);
-            WolfTeamPlayers.sendMessage("貴方は人狼に選ばれました");
+            // WolfTeamPlayers.sendMessage("貴方は人狼に選ばれました");
         }
         for (int i = BeforeMadmanPlayerCount; i > 0; i += -1) {
             Random random = new Random();
             Player MadmanTeamPlayers = Players.get(random.nextInt(Players.size()));
             if (teamM.hasEntry(MadmanTeamPlayers.getName())) {
-                MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
+                // MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
                 return;
             } else if (teamW.hasEntry(MadmanTeamPlayers.getName())) {
-                MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
+                // MadmanTeamPlayers.sendMessage("貴方はすでに狂人チームに所属しているため再抽選が行われます");
                 return;
             }
             teamM.addPlayer(MadmanTeamPlayers);
-            MadmanTeamPlayers.sendMessage("貴方は狂人に選ばれました");
+            // MadmanTeamPlayers.sendMessage("貴方は狂人に選ばれました");
         }
         for (Player playerALL5 : Bukkit.getOnlinePlayers()) {
             ALLPlayerCount++;
