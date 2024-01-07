@@ -17,17 +17,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -80,12 +80,15 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             openGUI(Objects.requireNonNull(AdminPlayer));
         }
         if (command.getName().equalsIgnoreCase("restartgame")) {
-            CountReset();
             if (!(sender instanceof Player) || !sender.isOp()) {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
                 return true;
             }
-            GameStart();
+            startTimer();
+            for (Player playerOI : Bukkit.getOnlinePlayers()) {
+                playerOI.playSound(playerOI.getLocation(), Sound.ITEM_TOTEM_USE, 5, 1);
+                playerOI.sendMessage(ChatColor.DARK_PURPLE + "ゲームをリスタートします");
+            }
         }
         if (command.getName().equalsIgnoreCase("stopgame")) {
             if (!(sender instanceof Player) || !sender.isOp()) {
@@ -201,9 +204,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Team teamW = scoreboardW.registerNewTeam("wolf");
         Team teamM = scoreboardM.registerNewTeam("madman");
         Team teamV = scoreboardV.registerNewTeam("villager");
-        teamM.setSuffix("[←この人は狂人です]");
-        teamW.setSuffix("[←この人は人狼です]");
-        teamV.setSuffix("[←この人は村人です]");
+        // teamM.setSuffix("[←この人は狂人です]");
+        // teamW.setSuffix("[←この人は人狼です]");
+        // teamV.setSuffix("[←この人は村人です]");
         for (Player playerACC : Bukkit.getOnlinePlayers()) {
             // playerACC.sendMessage("貴方を村人チームに追加しました");
             teamV.addPlayer(playerACC);
@@ -267,9 +270,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount - BeforeMadmanPlayerCount);
         startTimer();
         LocateChat();
+        TimerMain = 60 * 60 * 3;
     }
 
-    int TimerMain = 60 * 60 * 3; // 3時間
+    int TimerMain; // 3時間
     int TimerHour;
     int TimerMinutes;
     int TimerSecond;
@@ -281,6 +285,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     String none = " ";
 
     private void startTimer() {
+
         ScoreboardManager managerTime = Bukkit.getScoreboardManager();
         Scoreboard boardTime = Objects.requireNonNull(managerTime).getNewScoreboard();
         Objective objectiveT = boardTime.registerNewObjective("MainTimer", "dummy", ChatColor.RED + " Survival-Werewolf ");
@@ -500,28 +505,31 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     public BukkitRunnable chatFlowTask;
 
     String LCPlayer;
+    int LCx;
+    int LCy;
+    int LCz;
 
     public void LocateChat() {
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         chatFlowTask = new BukkitRunnable() {
             @Override
             public void run() {
+                List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
                 Random random = new Random();
                 Player randomPlayer = players.get(random.nextInt(players.size()));
                 String playerName = randomPlayer.getName();
                 if (randomPlayer.getGameMode() == GameMode.SPECTATOR) {
                     return;
                 }
-                int LCx = randomPlayer.getLocation().getBlockX();
-                int LCy = randomPlayer.getLocation().getBlockY();
-                int LCz = randomPlayer.getLocation().getBlockZ();
                 Location location = randomPlayer.getLocation();
+                LCx = location.getBlockX();
+                LCy = location.getBlockY();
+                LCz = location.getBlockZ();
                 String dimensionName = Objects.requireNonNull(location.getWorld()).getEnvironment().name();
                 for (Player playerA : Bukkit.getOnlinePlayers()) {
                     playerA.playSound(playerA.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 0.1f);
+                    playerA.sendMessage(ChatColor.YELLOW + "位置情報公開の時間です。");
+                    playerA.sendMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + LCx + ", Y=" + LCy + ", Z=" + LCz + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
                 }
-                Bukkit.broadcastMessage(ChatColor.YELLOW + "位置情報公開の時間です。");
-                Bukkit.broadcastMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + LCx + ", Y=" + LCy + ", Z=" + LCz + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
                 LCPlayer = playerName;
             }
         };
