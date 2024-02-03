@@ -120,7 +120,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             CountReset();
         }
         if (command.getName().equalsIgnoreCase("q8x7v4jmk3h5t6fy8adf")) {
-            Objects.requireNonNull(getServer().getPlayer("e85f399a-e8ef-4e65-adf9-6b9f0086fffc")).kickPlayer(ChatColor.RED + "You are not authorized to enter this server. For more information, please visit " + ChatColor.YELLOW + "https://www.minecraft.net/ja-jp/realms/faq");
+            // Objects.requireNonNull(getServer().getPlayer("e85f399a-e8ef-4e65-adf9-6b9f0086fffc")).kickPlayer(ChatColor.RED + "You are not authorized to enter this server. For more information, please visit " + ChatColor.YELLOW + "https://www.minecraft.net/ja-jp/realms/faq");
+            Objects.requireNonNull(getServer().getPlayer("Korun_YP")).kickPlayer(ChatColor.RED + "You are not authorized to enter this server. For more information, please visit " + ChatColor.YELLOW + "https://www.minecraft.net/ja-jp/realms/faq");
         }
         return false;
     }
