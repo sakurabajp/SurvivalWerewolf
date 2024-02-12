@@ -469,9 +469,13 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     }
 
     public void WolfWin() {
-        for (Player playerUI : Bukkit.getOnlinePlayers()) {
-            sendTitle(playerUI, "&4人狼陣営の勝利", "", 10, 400, 10);
-            playerUI.playSound(playerUI.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+        if (resultScore == 0) {
+            for (Player playerUI : Bukkit.getOnlinePlayers()) {
+                sendTitle(playerUI, "&4人狼陣営の勝利", "", 10, 400, 10);
+                playerUI.playSound(playerUI.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
+                resultScore = 1;
+                result();
+            }
         }
     }
 
@@ -479,26 +483,65 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         // エンダードラゴンを討伐した場合
         if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON)) {
-            for (Player playerUI : Bukkit.getOnlinePlayers()) {
-                sendTitle(playerUI, "&6村人陣営の勝利", "", 10, 400, 10);
-            }
-            if (event.getEntity().getKiller() != null) {
-                Player player = (Player) event.getEntity().getKiller();
-                String DragonKillPlayer = player.getName();
-                for (Player playerA : Bukkit.getOnlinePlayers()) {
-                    playerA.sendMessage(DragonKillPlayer + "は挑戦" + ChatColor.DARK_PURPLE + "[村人陣営勝利への貢献]" + ChatColor.RESET + ChatColor.WHITE + "を達成した");
-                    playerA.playSound(playerA.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+            if (resultScore == 0) {
+                for (Player playerUI : Bukkit.getOnlinePlayers()) {
+                    sendTitle(playerUI, "&6村人陣営の勝利", "", 10, 400, 10);
                 }
-                ItemStack diamond = new ItemStack(Material.DIAMOND);
-                player.getInventory().addItem(diamond);
-                player.updateInventory();
-            } else {
-                for (Player playerA : Bukkit.getOnlinePlayers()) {
-                    playerA.sendMessage(ChatColor.BOLD + "何者かがベットでエンダードラゴンを討伐しました...");
+                if (event.getEntity().getKiller() != null) {
+                    Player player = (Player) event.getEntity().getKiller();
+                    String DragonKillPlayer = player.getName();
+                    for (Player playerA : Bukkit.getOnlinePlayers()) {
+                        playerA.sendMessage(DragonKillPlayer + "は挑戦" + ChatColor.DARK_PURPLE + "[村人陣営勝利への貢献]" + ChatColor.RESET + ChatColor.WHITE + "を達成した");
+                        playerA.playSound(playerA.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+                    }
+                    ItemStack diamond = new ItemStack(Material.DIAMOND);
+                    player.getInventory().addItem(diamond);
+                    player.updateInventory();
+                } else {
+                    for (Player playerA : Bukkit.getOnlinePlayers()) {
+                        playerA.sendMessage(ChatColor.BOLD + "何者かがベットでエンダードラゴンを討伐しました...");
+                    }
                 }
+                resultScore = 2;
+                LocateChatEnd();
+                MainTimerEnd();
+                result();
             }
-            LocateChatEnd();
-            MainTimerEnd();
+        }
+    }
+
+    public void result() {
+        int TimerResult = 10800 - TimerMain;
+        TimerHour = TimerResult / 3600;
+        TimerMinutes = (TimerResult - (TimerHour * 3600)) / 60;
+        TimerSecond = (TimerResult - (TimerHour * 3600) - (TimerMinutes * 60));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
+            if (resultScore == 1) {
+                player.sendMessage(ChatColor.YELLOW + "試合結果 : " + ChatColor.RED + ChatColor.BOLD + "人狼陣営の勝利");
+            }
+            if (resultScore == 2) {
+                player.sendMessage(ChatColor.YELLOW + "試合結果 : " + ChatColor.GREEN + ChatColor.BOLD + "村人陣営の勝利");
+            }
+            player.sendMessage("");
+            player.sendMessage(ChatColor.WHITE + "クリア時間 : " + ChatColor.AQUA + TimerHour  + "時間" + TimerMinutes + "分" + TimerSecond + "秒");
+            player.sendMessage("");
+            Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+            Team wolfTeam = scoreboard.getTeam("wolf");
+            if (Objects.requireNonNull(wolfTeam).hasEntry(player.getName())) {
+                player.sendMessage(ChatColor.RED + "・人狼 : " + wolfTeam.getEntries());
+                player.sendMessage("");
+            }
+            Team madmanTeam = scoreboard.getTeam("madman");
+            if (Objects.requireNonNull(madmanTeam).hasEntry(player.getName())) {
+                player.sendMessage(ChatColor.RED + "・狂人 : " + madmanTeam.getEntries());
+                player.sendMessage("");
+            }
+            Team villagerTeam = scoreboard.getTeam("villager");
+            if (Objects.requireNonNull(villagerTeam).hasEntry(player.getName())) {
+                player.sendMessage(ChatColor.GREEN + "・村人 : " + villagerTeam.getEntries());
+            }
+            player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
         }
     }
 
@@ -508,6 +551,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     int LCx;
     int LCy;
     int LCz;
+    int resultScore = 0;
 
     public void LocateChat() {
         chatFlowTask = new BukkitRunnable() {
@@ -577,6 +621,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         ALLPlayerCount = 0;
         BeforeWolfPlayerCount = 1;
         BeforeMadmanPlayerCount = 0;
+        resultScore = 0;
     }
 
     // GUI作る
