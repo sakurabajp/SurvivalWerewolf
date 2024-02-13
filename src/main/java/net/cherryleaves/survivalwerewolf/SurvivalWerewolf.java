@@ -267,7 +267,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             playerALL5.removeScoreboardTag("Admin1");
             playerALL5.setStatistic(org.bukkit.Statistic.DEATHS, 0);
         }
-        VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount - BeforeMadmanPlayerCount);
+        VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount);
         startTimer();
         LocateChat();
         TimerMain = 60 * 60 * 3;
@@ -356,11 +356,11 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             // クリックされたGUIを取得する
             Inventory clickedInventory = event.getClickedInventory();
             if (clickedInventory == StartGUI) {
-                String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
                 GUIClickedPlayer.addScoreboardTag("Admin1");
                 // クリックされたアイテムを取得する
                 ItemStack clickedItem = event.getCurrentItem();
                 if (clickedItem != null && clickedItem.getType() == Material.RED_STAINED_GLASS_PANE) {
+                    String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
                     if (ClickedItemName.equals(ChatColor.RED + "クリックで人狼の数を減らす")) {
                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.0f);
                         if (BeforeWolfPlayerCount > 1) {
@@ -381,6 +381,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         openGUI(Objects.requireNonNull(GUIClickedPlayer));
                     }
                 } else if (clickedItem != null && clickedItem.getType() == Material.BLUE_STAINED_GLASS_PANE) {
+                    String ClickedItemName = Objects.requireNonNull(Objects.requireNonNull(event.getCurrentItem()).getItemMeta()).getDisplayName();
                     if (ClickedItemName.equals(ChatColor.BLUE + "クリックで人狼の数を増やす")) {
                         BeforeWolfPlayerCount += (1);
                         GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1.0f, 1.2f);
