@@ -180,6 +180,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     }
 
     int VillagerCount;
+    int MadmanCount;
     int ALLPlayerCount;
 
     public void GameStart() {
@@ -267,7 +268,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             playerALL5.removeScoreboardTag("Admin1");
             playerALL5.setStatistic(org.bukkit.Statistic.DEATHS, 0);
         }
-        VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount);
+        VillagerCount = 2 * (ALLPlayerCount - BeforeWolfPlayerCount -BeforeMadmanPlayerCount);
+        MadmanCount = 2 * BeforeMadmanPlayerCount;
         startTimer();
         LocateChat();
         TimerMain = 60 * 60 * 3;
@@ -333,7 +335,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     LocateChatEnd();
                     WolfWin();
                 }
-                if (VillagerCount <= 0) {
+                if (VillagerCount <= 0 && MadmanCount <= 0) {
                     MainTimerEnd();
                     LocateChatEnd();
                     WolfWin();
@@ -457,6 +459,10 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Team team = scoreboard.getEntryTeam(DeathPlayer.getName());
         if (team != null && team.getName().equals("villager")) {
             VillagerCount = VillagerCount - 1;
+        }
+        Team teamM = scoreboard.getEntryTeam(DeathPlayer.getName());
+        if (teamM != null && teamM.getName().equals("madman")) {
+            MadmanCount = MadmanCount - 1;
         }
         /*if (team != null && team.getName().equals("madman")) {
             DeathPlayer.setGameMode(GameMode.SPECTATOR);
