@@ -474,9 +474,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             for (Player playerUI : Bukkit.getOnlinePlayers()) {
                 sendTitle(playerUI, "&4人狼陣営の勝利", "", 10, 400, 10);
                 playerUI.playSound(playerUI.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
-                resultScore = 1;
-                result();
             }
+            resultScore = 1;
+            result();
         }
     }
 
@@ -529,19 +529,13 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             player.sendMessage("");
             Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
             Team wolfTeam = scoreboard.getTeam("wolf");
-            if (Objects.requireNonNull(wolfTeam).hasEntry(player.getName())) {
-                player.sendMessage(ChatColor.RED + "・人狼 : " + wolfTeam.getEntries());
-                player.sendMessage("");
-            }
+            player.sendMessage(ChatColor.RED + "・人狼 : " + Objects.requireNonNull(wolfTeam).getEntries());
+            player.sendMessage("");
             Team madmanTeam = scoreboard.getTeam("madman");
-            if (Objects.requireNonNull(madmanTeam).hasEntry(player.getName())) {
-                player.sendMessage(ChatColor.RED + "・狂人 : " + madmanTeam.getEntries());
-                player.sendMessage("");
-            }
+            player.sendMessage(ChatColor.DARK_PURPLE + "・狂人 : " + Objects.requireNonNull(madmanTeam).getEntries());
+            player.sendMessage("");
             Team villagerTeam = scoreboard.getTeam("villager");
-            if (Objects.requireNonNull(villagerTeam).hasEntry(player.getName())) {
-                player.sendMessage(ChatColor.GREEN + "・村人 : " + villagerTeam.getEntries());
-            }
+            player.sendMessage(ChatColor.GREEN + "・村人 : " + Objects.requireNonNull(villagerTeam).getEntries());
             player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
         }
     }
