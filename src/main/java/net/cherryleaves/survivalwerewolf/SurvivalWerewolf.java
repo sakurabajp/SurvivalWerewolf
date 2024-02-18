@@ -124,7 +124,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoinServer(PlayerJoinEvent Player) {
-        Player.setJoinMessage(ChatColor.YELLOW + Player.getPlayer().getName() + "さんがマイクラサバイバル人狼のサーバーに参加しました！");
+        Player.setJoinMessage(ChatColor.RED + "[マイクラ人狼サバイバル]" + ChatColor.AQUA + Player.getPlayer().getName() + "さんが参加しました！");
     }
 
     Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
