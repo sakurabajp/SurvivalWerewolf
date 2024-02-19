@@ -23,8 +23,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
@@ -124,7 +122,11 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerJoinServer(PlayerJoinEvent Player) {
-        Player.setJoinMessage(ChatColor.RED + "[マイクラ人狼サバイバル]" + ChatColor.AQUA + Player.getPlayer().getName() + "さんが参加しました！");
+        Player.setJoinMessage(ChatColor.RED + "[マイクラ人狼サバイバル] " + ChatColor.RESET + ChatColor.AQUA + Player.getPlayer().getName() + "さんが参加しました！");
+        Player player = Player.getPlayer();
+        player.setGameMode(GameMode.ADVENTURE);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 90000, 20, false, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 90000, 20, false, true));
     }
 
     Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
@@ -243,6 +245,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             playerALL5.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 5, true, false));
             playerALL5.playSound(playerALL5.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.5f, 1.0f);
             playerALL5.getInventory().clear();
+            playerALL5.getActivePotionEffects().clear();
             sendTitle(playerALL5, "&6ゲームスタート！", "", 10, 40, 10);
             playerALL5.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
             playerALL5.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "ゲームスタート！");
@@ -320,7 +323,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 TimerSecond = (TimerMain - (TimerHour * 3600) - (TimerMinutes * 60));
                 TimerMain = TimerMain - 1;
                 // ロケートチャットタイマー
-                CLMain = TimerMain % 300 + 1;
+                CLMain = TimerMain % 180 + 1;
                 CLM = CLMain / 60;
                 CLS = CLMain - (CLM * 60);
                 Score score7 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "残り時間 : " + ChatColor.RESET + ChatColor.YELLOW + TimerHour + ":" + TimerMinutes + ":" + TimerSecond);
@@ -434,7 +437,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     GUIClickedPlayer.closeInventory();
                     ItemStack itemStack1 = new ItemStack(Material.AIR);
                     GUIClickedPlayer.getInventory().setItemInMainHand(itemStack1);
-                    player.decrementStatistic(Statistic.DEATHS);
+                    player.decrementStatistic(Statistic.DEATHS, 1);
                     event.setCancelled(true);
                 }
                 else {
@@ -617,7 +620,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     public void CountReset() {
         TimerMain = 60 * 60 * 3;
-        CLMain = 300;
+        CLMain = 180;
         VillagerCount = 0;
         ALLPlayerCount = 0;
         BeforeWolfPlayerCount = 1;
