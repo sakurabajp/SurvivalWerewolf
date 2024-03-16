@@ -591,7 +591,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         if(TimerMain > 9000){
             event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "残り時間が" + ChatColor.BOLD + "2時間" + ChatColor.RESET + ChatColor.RED + "を切る前にネザーに入ることはできません");
+            player.sendMessage(ChatColor.RED + "残り時間が" + ChatColor.BOLD + "2時間30分" + ChatColor.RESET + ChatColor.RED + "を切る前にネザーに入ることはできません");
             player.playSound(player.getLocation(), Sound.ENTITY_SPIDER_DEATH, 1.0f, 1.0f);
         }
     }
