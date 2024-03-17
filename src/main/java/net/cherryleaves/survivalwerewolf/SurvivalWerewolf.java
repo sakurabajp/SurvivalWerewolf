@@ -11,10 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -125,9 +122,13 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoinServer(PlayerJoinEvent Player) {
         Player.setJoinMessage(ChatColor.RED + "[マイクラ人狼サバイバル] " + ChatColor.RESET + ChatColor.AQUA + Player.getPlayer().getName() + "さんが参加しました！");
-        Player player = Player.getPlayer();
-        player.setGameMode(GameMode.ADVENTURE);
     }
+
+    @EventHandler
+    public void onPlayerLeaveServer(PlayerQuitEvent Player) {
+        Player.setQuitMessage(ChatColor.RED + "[マイクラ人狼サバイバル] " + ChatColor.RESET + ChatColor.AQUA + Player.getPlayer().getName() + "さんがサーバーを退出しました");
+    }
+
 
     Inventory StartGUI = Bukkit.createInventory(null, 9, ChatColor.DARK_AQUA + "プレイヤー人数と役職数の確認");
 
@@ -323,7 +324,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 TimerSecond = (TimerMain - (TimerHour * 3600) - (TimerMinutes * 60));
                 TimerMain = TimerMain - 1;
                 // ロケートチャットタイマー
-                CLMain = (TimerMain % CLMain) + 1;
+                CLMain = TimerMain % 180 + 1;
                 CLM = CLMain / 60;
                 CLS = CLMain - (CLM * 60);
                 Score score7 = Objects.requireNonNull(objectiveT).getScore(ChatColor.AQUA + "" + ChatColor.BOLD + "残り時間 : " + ChatColor.RESET + ChatColor.YELLOW + TimerHour + ":" + TimerMinutes + ":" + TimerSecond);
