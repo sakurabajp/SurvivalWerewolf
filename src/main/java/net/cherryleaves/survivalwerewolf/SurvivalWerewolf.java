@@ -658,7 +658,11 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Location location = player.getLocation();
         ItemStack itemStack1 = new ItemStack(Material.AIR);
         ItemStack item = player.getInventory().getItemInMainHand();
-
+        // スペクテイターが動いたら暗視がつくやつ
+        if(player.getGameMode().equals(GameMode.SPECTATOR)){
+            player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,1000, 1, true, false));
+        }
+        // 右クリ検知
         if (event.getAction().toString().contains("RIGHT_CLICK")) {
             if (player.getInventory().getItemInMainHand().getType() == Material.KNOWLEDGE_BOOK) {
                 if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.AQUA + "" + ChatColor.BOLD + "エンダーパール入手本")) {
