@@ -438,7 +438,14 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     GUIClickedPlayer.closeInventory();
                     ItemStack itemStack1 = new ItemStack(Material.AIR);
                     GUIClickedPlayer.getInventory().setItemInMainHand(itemStack1);
-                    player.decrementStatistic(Statistic.DEATHS, 1);
+                    if(player.getStatistic(Statistic.DEATHS) > 0) {
+                        player.decrementStatistic(Statistic.DEATHS, 1);
+                    }
+                    else if(player.getStatistic(Statistic.DEATHS) <= 0){
+                        player.sendMessage(ChatColor.RED + "貴方は一回も死亡していないため復活本の効力が発揮されませんでした");
+                        player.stopSound(Sound.ITEM_TOTEM_USE);
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
+                    }
                     event.setCancelled(true);
                 }
                 else {
