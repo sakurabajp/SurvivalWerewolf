@@ -445,6 +445,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         player.sendMessage(ChatColor.RED + "貴方は一回も死亡していないため復活本の効力が発揮されませんでした");
                         player.stopSound(Sound.ITEM_TOTEM_USE);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 1.0f);
+                        // 別スコアボード作って、そこの値を変わりに増やして、もしそのプレイヤーが死んだときにそのスコアボードの値が1以上だったら変わりに減らしてデス数もとに戻すというクソめんどくさいコード書けばいけそう
                     }
                     event.setCancelled(true);
                 }
