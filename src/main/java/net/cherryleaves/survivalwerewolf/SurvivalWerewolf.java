@@ -404,8 +404,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     GUIClickedPlayer.playSound(GUIClickedPlayer.getLocation(), Sound.ENTITY_RABBIT_DEATH, 1.0f, 1.2f);
                 }
                 event.setCancelled(true);
-            }
-            else if (clickedInventory == guiQ) {
+            } else if (clickedInventory == guiQ) {
                 // クリックされたアイテムを取得する
                 ItemStack clickedItem = event.getCurrentItem();
                 if (clickedItem != null && clickedItem.getType() == Material.PLAYER_HEAD) {
@@ -417,7 +416,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     GUIClickedPlayer.sendMessage(ChatColor.BOLD + "" + ChatColor.GOLD + itemName + ChatColor.RED + " が10秒後に復活します");
                     GUIClickedPlayer.playSound(Objects.requireNonNull(player).getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1.0f, 2.0f);
                     Objects.requireNonNull(GUIClickedPlayer.getLocation().getWorld()).spawnParticle(Particle.PORTAL, GUIClickedPlayer.getLocation(), 2000);
-                    if (player.getGameMode().equals(GameMode.SPECTATOR)){
+                    if (player.getGameMode().equals(GameMode.SPECTATOR)) {
                         player.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_RED + "あなたは復活の本により後10秒で復活します");
                         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
                         new BukkitRunnable() {
@@ -448,8 +447,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                         // 別スコアボード作って、そこの値を変わりに増やして、もしそのプレイヤーが死んだときにそのスコアボードの値が1以上だったら変わりに減らしてデス数もとに戻すというクソめんどくさいコード書けばいけそう
                     }
                     event.setCancelled(true);
-                }
-                else {
+                } else {
                     event.setCancelled(true);
                     GUIClickedPlayer.playSound(Objects.requireNonNull(GUIClickedPlayer).getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.1f);
                     GUIClickedPlayer.sendMessage(ChatColor.GOLD + "復活本" + ChatColor.RED + "のメニューを操作することはできません");
