@@ -87,6 +87,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 playerOI.sendMessage(ChatColor.DARK_PURPLE + "ゲームをリスタートします");
             }
         }
+        if (command.getName().equalsIgnoreCase("job")) {
+            check_job((Player) sender);
+        }
         if (command.getName().equalsIgnoreCase("stopgame")) {
             if (!(sender instanceof Player) || !sender.isOp()) {
                 sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
@@ -262,6 +265,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
             }
             if (teamM.hasEntry(playerALL5.getName())) {
                 playerALL5.sendMessage(ChatColor.DARK_AQUA + "あなたは" + ChatColor.LIGHT_PURPLE + "狂人陣営" + ChatColor.DARK_AQUA + "です");
+                playerALL5.sendMessage(ChatColor.DARK_AQUA + "人狼は" + ChatColor.RED + teamW.getEntries() + ChatColor.DARK_AQUA + "です");
             }
             playerALL5.sendMessage(ChatColor.BOLD + "" + ChatColor.DARK_GREEN + "-----------------------------------------------------");
             for (Player playerAdminTAG1 : Bukkit.getOnlinePlayers()) {
@@ -465,7 +469,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Player DeathPlayer = event.getEntity().getPlayer();
         assert DeathPlayer != null;
 
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
         Team team = scoreboard.getEntryTeam(DeathPlayer.getName());
         if (team != null && team.getName().equals("villager")) {
             VillagerCount = VillagerCount - 1;
@@ -505,7 +509,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     sendTitle(playerUI, "&6村人陣営の勝利", "", 10, 400, 10);
                 }
                 if (event.getEntity().getKiller() != null) {
-                    Player player = (Player) event.getEntity().getKiller();
+                    Player player = event.getEntity().getKiller();
                     String DragonKillPlayer = player.getName();
                     for (Player playerA : Bukkit.getOnlinePlayers()) {
                         playerA.sendMessage(DragonKillPlayer + "は挑戦" + ChatColor.DARK_PURPLE + "[村人陣営勝利への貢献]" + ChatColor.RESET + ChatColor.WHITE + "を達成した");
@@ -726,13 +730,13 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     }
                 }
                 if (Objects.requireNonNull(item.getItemMeta()).getDisplayName().equals(ChatColor.DARK_RED + "" + ChatColor.BOLD + "盲目本")) {
+                    for (Player playerA : Bukkit.getOnlinePlayers()) {
+                        playerA.playSound(playerA.getLocation(), Sound.ENTITY_VEX_CHARGE, 2.0f, 1.0f);
+                        playerA.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "村人陣営を盲目にさせました");
+                    }
                     Scoreboard scoreboardA = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
                     Team teamA = scoreboardA.getTeam("wolf");
                     if(teamA != null && teamA.hasEntry(player.getName())) {
-                        // プレイヤーにメッセージを表示する
-                        player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "村人陣営を盲目にさせました");
-                        // 効果音を鳴らす
-                        player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 0.5f, 1.0f);
                         // パーティクルを表示する
                         // Objects.requireNonNull(location.getWorld()).spawnParticle(Particle.BLOCK_DUST, location, 1000);
                         // アイテムを消す
@@ -758,5 +762,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 }
             }
         }
+    }
+    public void check_job(Player p){
+        p.sendMessage(ChatColor.AQUA + "あなたの役職は" + ChatColor.WHITE + ChatColor.BOLD + ChatColor.UNDERLINE + Objects.requireNonNull(Objects.requireNonNull(p.getServer().getScoreboardManager()).getMainScoreboard().getEntryTeam(p.getName())).getName() + ChatColor.RESET + ChatColor.AQUA + "です");
+        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f);
     }
 }

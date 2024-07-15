@@ -12,3 +12,5 @@ commands:
     description: stop the game.
   resetgame:
     description: reset the game.
+  job:
+    description: 自分の役職を確認する。
