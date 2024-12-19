@@ -26,9 +26,6 @@ import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
-    private BukkitRunnable timerTask;
-    private boolean isTimerRunning = false;
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -215,9 +212,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         Team teamW = scoreboardW.registerNewTeam("wolf");
         Team teamM = scoreboardM.registerNewTeam("madman");
         Team teamV = scoreboardV.registerNewTeam("villager");
-        // teamM.setSuffix("[←この人は狂人です]");
-        // teamW.setSuffix("[←この人は人狼です]");
-        // teamV.setSuffix("[←この人は村人です]");
         for (Player playerACC : Bukkit.getOnlinePlayers()) {
             // playerACC.sendMessage("貴方を村人チームに追加しました");
             teamV.addPlayer(playerACC);
@@ -358,7 +352,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 }
             }
         };
-        TimerM.runTaskTimer(this, 0, 20); // 20 ticks = 1 second
+        TimerM.runTaskTimer(this, 0, 1); // 20 ticks = 1 second
     }
 
     public BukkitRunnable TimerM;
@@ -486,9 +480,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
         if (teamM != null && teamM.getName().equals("madman")) {
             MadmanCount = MadmanCount - 1;
         }
-        /*if (team != null && team.getName().equals("madman")) {
-            DeathPlayer.setGameMode(GameMode.SPECTATOR);
-        }*/
         if (DeathPlayer.getStatistic(org.bukkit.Statistic.DEATHS) >= 1) {
             DeathPlayer.setGameMode(GameMode.SPECTATOR);
         }
