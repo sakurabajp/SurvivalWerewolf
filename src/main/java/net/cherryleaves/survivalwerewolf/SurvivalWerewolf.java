@@ -25,6 +25,10 @@ import org.bukkit.scoreboard.*;
 import java.util.*;
 
 public final class SurvivalWerewolf extends JavaPlugin implements Listener {
+
+    private BukkitRunnable timerTask;
+    private boolean isTimerRunning = false;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -287,6 +291,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     int TimerHour;
     int TimerMinutes;
     int TimerSecond;
+    int DefineCLMain;
     int CLMain;
     int CLS;
     int CLM;
@@ -337,6 +342,9 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 score5.setScore(5);
                 for (Player playerA : Bukkit.getOnlinePlayers()) {
                     playerA.setScoreboard(boardTime);
+                }
+                if(CLMain == 1){
+                    LocateChat();
                 }
                 if (TimerMain < 0) {
                     MainTimerEnd();
@@ -569,9 +577,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
     int resultScore = 0;
 
     public void LocateChat() {
-        chatFlowTask = new BukkitRunnable() {
-            @Override
-            public void run() {
                 List<Player> players = new ArrayList<>();
                 for (Player playerTT : Bukkit.getServer().getOnlinePlayers()) {
                     if (playerTT.getGameMode() != GameMode.SPECTATOR) {
@@ -592,9 +597,6 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     playerA.sendMessage(ChatColor.RED + playerName + ChatColor.GREEN + " の座標は、" + ChatColor.RED + "X=" + LCx + ", Y=" + LCy + ", Z=" + LCz + ChatColor.GREEN + ", \nディメンションは" + ChatColor.RED + dimensionName + ChatColor.GREEN + "です");
                 }
                 LCPlayer = playerName;
-            }
-        };
-        chatFlowTask.runTaskTimer(this, 0, CLMain * 20L); // 6000 ticks = 5 minutes
     }
 
     @EventHandler
@@ -651,7 +653,8 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
 
     public void CountReset() {
         TimerMain = 60 * 60 * 3;
-        CLMain = 180;
+        DefineCLMain = 180;
+        CLMain = DefineCLMain;
         VillagerCount = 0;
         ALLPlayerCount = 0;
         BeforeWolfPlayerCount = 1;
