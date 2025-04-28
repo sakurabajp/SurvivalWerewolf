@@ -6,7 +6,7 @@
 
     <groupId>net.cherry-leaves</groupId>
     <artifactId>SurvivalWerewolf</artifactId>
-    <version>1.0.16</version>
+    <version>1.0.17</version>
     <packaging>jar</packaging>
 
     <name>SurvivalWerewolf</name>
