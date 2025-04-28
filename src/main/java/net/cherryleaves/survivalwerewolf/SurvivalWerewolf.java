@@ -352,7 +352,7 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                 }
             }
         };
-        TimerM.runTaskTimer(this, 0, 1); // 20 ticks = 1 second
+        TimerM.runTaskTimer(this, 0, 20); // 20 ticks = 1 second
     }
 
     public BukkitRunnable TimerM;
@@ -445,6 +445,15 @@ public final class SurvivalWerewolf extends JavaPlugin implements Listener {
                     GUIClickedPlayer.getInventory().setItemInMainHand(itemStack1);
                     if(player.getStatistic(Statistic.DEATHS) > 0) {
                         player.decrementStatistic(Statistic.DEATHS, 1);
+                        Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getMainScoreboard();
+                        Team team = scoreboard.getEntryTeam(player.getName());
+                        if (team != null && team.getName().equals("villager")) {
+                            VillagerCount = VillagerCount + 1;
+                        }
+                        Team teamM = scoreboard.getEntryTeam(player.getName());
+                        if (teamM != null && teamM.getName().equals("madman")) {
+                            MadmanCount = MadmanCount + 1;
+                        }
                     }
                     else if(player.getStatistic(Statistic.DEATHS) <= 0){
                         player.sendMessage(ChatColor.RED + "貴方は一回も死亡していないため復活本の効力が発揮されませんでした");
