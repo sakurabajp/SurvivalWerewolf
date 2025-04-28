@@ -21,6 +21,7 @@ public class Item implements Listener {
         // ここからアイテムB
         ItemStack itemB = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaB = itemB.getItemMeta(); // metaを登録
+        Objects.requireNonNull(metaB).setCustomModelData(1); // カスタムモデルデータを設定
         Objects.requireNonNull(metaB).setDisplayName(ChatColor.AQUA + "" + ChatColor.BOLD + "エンダーパール入手本");
         itemB.setItemMeta(metaB);
         NamespacedKey keyB = new NamespacedKey(Objects.requireNonNull(plugin), "EnderP");
@@ -39,6 +40,7 @@ public class Item implements Listener {
         ItemStack itemC = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaC = itemC.getItemMeta(); // metaを登録
         Objects.requireNonNull(metaC).setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "復活本");
+        Objects.requireNonNull(metaC).setCustomModelData(2); // カスタムモデルデータを設定
         itemC.setItemMeta(metaC);
         NamespacedKey keyC = new NamespacedKey(Objects.requireNonNull(plugin), "FukkatsuBook");
         ShapedRecipe recipeC = new ShapedRecipe(keyC, itemC); // レシピオブジェクトの作成
@@ -56,6 +58,7 @@ public class Item implements Listener {
     public static void getRecipeD(JavaPlugin plugin){
         ItemStack itemD = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta metaD = itemD.getItemMeta(); // metaを登録
+        Objects.requireNonNull(metaD).setCustomModelData(3); // カスタムモデルデータを設定
         Objects.requireNonNull(metaD).setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "盲目本");
         itemD.setItemMeta(metaD);
 
@@ -75,7 +78,6 @@ public class Item implements Listener {
         ItemStack itemE = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1); // アイテムを作る
         ItemMeta metaE = itemE.getItemMeta(); // metaを登録
         itemE.setItemMeta(metaE);
-
         NamespacedKey key = new NamespacedKey(Objects.requireNonNull(plugin), "Gapple");
         ShapedRecipe recipeE = new ShapedRecipe(key, itemE); // レシピオブジェクトの作成
         // レシピの形状を設定
@@ -89,6 +91,7 @@ public class Item implements Listener {
     public static void getRecipeF(JavaPlugin plugin){
         ItemStack item = new ItemStack(Material.KNOWLEDGE_BOOK, 1); // アイテムを作る
         ItemMeta meta = item.getItemMeta(); // metaを登録
+        Objects.requireNonNull(meta).setCustomModelData(4); // カスタムモデルデータを設定
         Objects.requireNonNull(meta).setDisplayName(ChatColor.WHITE + "" + ChatColor.BOLD + "透明化");
         item.setItemMeta(meta);
 
